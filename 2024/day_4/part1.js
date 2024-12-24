@@ -1,4 +1,4 @@
-const path = "demo.txt";
+const path = "entry.txt";
 const file = Bun.file(path);
 
 const text = await file.text()
@@ -8,75 +8,93 @@ const a = [...row.map(element => {
   return element.split('')
 })]
 
-let numRows, numCols;
+const h = a.length 
+const w = a[0].length
+let count = 0
 
-numRows = a.length
-numCols = a[0].length
+const gotMatch = (r, c, s) => {
 
-// Define arrays for 
-// searching in all 8 directions
-let dx = [-1, -1, -1, 0, 0, 1, 1, 1];
-let dy = [-1, 0, 1, -1, 1, -1, 0, 1];
+    if (r < 0) { return false }
+    if (c < 0) { return false }
 
-// This function searches for a word in all
-// 8 directions from a 
-// starting point (r, c) in the grid
-function searchWord(grid, r, c, word) {
-    // If the first character of the word
-    // doesn't match with the 
-    // starting point in the grid
-    if (grid[r] !== word[0])
-        return false;
+    if (r >= h) { return false }
+    if (c >= w)  { return false }
 
-    let wordLength = word.length;
-    let directionIndex = 0;
-
-    // Search for the word in all 8 directions
-    // starting from (r, c)
-    while (directionIndex < 8) {
-        // Initialize the starting point
-        // for the current direction
-        let k, currentRow = r + dx[directionIndex];
-        let currentCol = c + dy[directionIndex];
-
-        // The first character is already 
-        // checked, match the remaining characters
-        for (k = 1; k < wordLength; k++) {
-            // If out of bounds, break
-            if (currentRow >= numRows || currentRow < 0 ||
-                currentCol >= numCols || currentCol < 0)
-                break;
-
-            // If not matched, break
-            if (grid[currentRow][currentCol] !== word[k])
-                break;
-
-            // Move in a particular direction
-            currentRow += dx[directionIndex];
-            currentCol += dy[directionIndex];
-        }
-
-        // If all characters matched, the value of k must
-        // be equal to the length of the word
-        if (k === wordLength)
-            return true;
-
-        directionIndex++;
-    }
-
-    return false;
+    return a[r][c] == s
 }
 
-// Search for the given word in a given
-// matrix in all 8 directions
-function findPattern(grid, targetWord) {
-    // Consider every point as a 
-    // starting point and search for the given word
-    for (let r = 0; r < numRows; r++) {
-        for (let c = 0; c < numCols; c++) {
-            if (searchWord(grid, r, c, targetWord))
-                console.log("Pattern found at " + r + ", " + c);
-        }
+
+const checkToEast = (r, c) => {
+    if (! gotMatch(r, c + 1,  "M")) { return }
+    if (! gotMatch(r, c + 2,  "A")) { return }
+    if (! gotMatch(r, c + 3,  "S")) { return }
+    count++
+}
+
+const checkToWest = (r, c) => {
+    if (! gotMatch(r, c - 1,  "M")) { return }
+    if (! gotMatch(r, c - 2,  "A")) { return }
+    if (! gotMatch(r, c - 3,  "S")) { return }
+    count++
+}
+
+const checkToNorth = (r, c) => {
+    if (! gotMatch(r - 1, c,  "M")) { return }
+    if (! gotMatch(r - 2, c,  "A")) { return }
+    if (! gotMatch(r - 3, c,  "S")) { return }
+    count++
+}
+
+const checkToSouth = (r, c) => {
+    if (! gotMatch(r + 1, c,  "M")) { return }
+    if (! gotMatch(r + 2, c,  "A")) { return }
+    if (! gotMatch(r + 3, c,  "S")) { return }
+    count++
+}
+
+const checkToNorthEast = (r, c) => {
+    if (! gotMatch(r - 1, c + 1,  "M")) { return }
+    if (! gotMatch(r - 2, c + 2,  "A")) { return }
+    if (! gotMatch(r - 3, c + 3,  "S")) { return }
+    count++
+}
+
+const checkToNorthWest = (r, c) => {
+    if (! gotMatch(r - 1, c - 1,  "M")) { return }
+    if (! gotMatch(r - 2, c - 2,  "A")) { return }
+    if (! gotMatch(r - 3, c - 3,  "S")) { return }
+    count++
+}
+
+const checkToSouthEast = (r, c) => {
+    if (! gotMatch(r + 1, c + 1,  "M")) { return }
+    if (! gotMatch(r + 2, c + 2,  "A")) { return }
+    if (! gotMatch(r + 3, c + 3,  "S")) { return }
+    count++
+}
+
+const checkToSouthWest = (r, c) => {
+    if (! gotMatch(r + 1, c - 1,  "M")) { return }
+    if (! gotMatch(r + 2, c - 2,  "A")) { return }
+    if (! gotMatch(r + 3, c - 3,  "S")) { return }
+    count++
+}
+
+const checkXmasAt = (r, c) => {
+    if(a[r][c]!= "X") {return}
+    checkToEast(r, c)
+    checkToWest(r, c)
+    checkToNorth(r, c)
+    checkToSouth(r, c)
+    checkToNorthEast(r, c)
+    checkToNorthWest(r, c)
+    checkToSouthEast(r, c)
+    checkToSouthWest(r, c)
+}
+
+for (let r = 0; r < h; r++) {
+    for (let c = 0; c < w; c++) {
+        checkXmasAt(r, c)   
     }
 }
-console.log(findPattern(a, 'XMAS'))
+console.log(count)
