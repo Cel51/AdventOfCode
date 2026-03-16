@@ -24,26 +24,17 @@ lines.forEach(line => {
         match = regex.exec(line);
     }
 
-    // If steps are greater than 100, we can take the modulus to wrap around the dials
-    if(steps > 100) {
-        steps = steps % 100;
-    }
+    for (let i = 0; i < steps; i++) {
+        if(direction === 'L') {
+            index = (index - 1 + 100) % 100;
+        } else if(direction === 'R') {
+            index = (index + 1) % 100;
+        }
 
-    if (direction === 'L') {
-        index -= steps;
-    } else {
-        index += steps;
+        if(index === 0) {
+            password++;
+        }
     }
-
-    if (index < 0) {
-        index += 100;
-    } else if (index >= 100) {
-        index -= 100;
-    }
-
-    console.log(`Direction: ${direction}, Steps: ${steps}, Index: ${index}`);
-    if(index == 0) {
-        password++;
-    }
+    console.log(`Turn ${direction} ${steps} steps. Now pointing at ${index}. Current password: ${password}`);
 });
-console.log(password);
+console.log(`Final password: ${password}`);
