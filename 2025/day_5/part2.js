@@ -48,13 +48,3 @@ uniqueRange.forEach(range => {
 });
 
 console.log(`Total unique numbers in range: ${count}`);
-
-    
-
-/* ranges.forEach(range => {
-    for (let i = range.start; i <= range.end; i++) {
-        uniqueNumbers.push(i);
-    }
-});
- */
-//console.log(`Unique numbers in range: ${uniqueNumbers.length}`);
