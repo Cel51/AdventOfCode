@@ -4,47 +4,64 @@ const path = require('path');
 const filePath = path.join(__dirname, 'entry.txt');
 
 const lines = fs.readFileSync(filePath, 'utf-8')
-    .split('\n\n')
+    .split('\n')
     .map((line, idx) => {
-        return line.split('\n');
+        return line.split('').reverse();
     });
 
-const ranges = lines[0].map(line => {
-    const [start, end] = line.split('-').map(Number);
-    return { start, end };
-}).sort((a, b) => a.start - b.start);
 
-const numbers = lines[1].map(Number);
+console.table(lines);
 
-function mergeRanges(ranges) {
-    if (ranges.length === 0) return [];
-    
-    const merged = [ranges[0]];
-    
-    for (let i = 1; i < ranges.length; i++) {
-        const lastMerged = merged[merged.length - 1];
-        const current = ranges[i];
-        
-        if (current.start <= lastMerged.end) {
-            // Overlapping ranges, merge them
-            lastMerged.end = Math.max(lastMerged.end, current.end);
-        }
-        else {
-            // Non-overlapping range, add to merged list
-            merged.push(current);
+let lengthCol = lines[0].length;
+let lengthRow = lines.length;
+
+const operator = [];
+const groupNumber = [];
+
+for (let j = 0; j < lengthCol; j++) {
+    const number = [];
+    for (let i = 0; i < lengthRow - 1; i++) {
+        if(parseInt(lines[i][j])) {
+            number.push(lines[i][j]);
         }
     }
-    
-    return merged;
+    if(lines[lengthRow - 1][j] !== ' ') {
+        operator.push(lines[lengthRow - 1][j]);
+    }
+    groupNumber.push(parseInt(number.join("")));
 }
 
+// iterate on the groupNumber, if the value is NaN, if there no array, add an array inside the array until the next NaN
+const result = [];
+let currentGroup = [];
+for (let i = 0; i < groupNumber.length; i++) {
+    if (isNaN(groupNumber[i])) {
+        if (currentGroup.length > 0) {
+            result.push(currentGroup);
+            currentGroup = [];
+        }
+    }
+    else {
+        currentGroup.push(groupNumber[i]);
+    }
+}
+if (currentGroup.length > 0) {
+    result.push(currentGroup);
+}
 
-const uniqueRange = mergeRanges(ranges);
+// at the end of the result, we have an array of arrays, we need to iterate on the result and apply the operator to the group of numbers
+let finalResult = 0;
+for (let i = 0; i < result.length; i++) {
+    let groupResult = result[i][0];
+    for (let j = 1; j < result[i].length; j++) {
+        if (operator[i] === '+') {
+            groupResult += result[i][j];
+        }
+        else if (operator[i] === '*') {
+            groupResult *= result[i][j];
+        }
+    }
+    finalResult += groupResult;
+}
 
-let count = 0;
-
-uniqueRange.forEach(range => {
-    count += (range.end - range.start + 1);
-});
-
-console.log(`Total unique numbers in range: ${count}`);
+console.log(finalResult);
